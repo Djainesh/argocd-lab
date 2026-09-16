@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: list-demo
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - appName: nginx-as
+            path: manifests/nginx
+          - appName: redis-as
+            path: manifests/redis
+  template:
+    metadata:
+      name: '{{appName}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/Djainesh/argocd-lab.git
+        targetRevision: main
+        path: '{{path}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: default
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
